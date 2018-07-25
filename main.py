@@ -5,7 +5,7 @@ import torch.optim as optim
 
 import argparse
 
-from train import run_sim
+from train import run_sim, test
 from shared_optim import SharedRMSprop, SharedAdam
 from models import A3C_LSTM
 
@@ -13,7 +13,7 @@ targets = ['bedroom', 'kitchen', 'bathroom', 'dining_room', 'living_room']
 
 class Params():
     def __init__(self):
-        self.n_process = 15
+        self.n_process = 12
         self.max_episode = 10000
         self.batch_size = 128
         self.gamma = 0.99
@@ -23,6 +23,7 @@ class Params():
         self.seed = 1
         self.amsgrad = True
         self.num_steps = 20
+        self.hardness = 0.6
 
 def main():
     #parser = argparse.ArgumentParser()
@@ -38,22 +39,22 @@ def main():
 
     shared_optimizer = SharedAdam(shared_model.parameters(), lr=params.lr, amsgrad=params.amsgrad)
     shared_optimizer.share_memory()
-    run_sim(0, params, shared_model, shared_optimizer)
+    #run_sim(0, params, shared_model, shared_optimizer)
 
-    '''
+
     mp.set_start_method('spawn')
     processes = []
-    #p = mp.Process(target=test, args=(args, params, shared_model,))
-    #p.start()
-    #processes.append(p)
+    p = mp.Process(target=test, args=(params, shared_model,))
+    p.start()
+    processes.append(p)
 
     for rank in range(params.n_process):
-        p = mp.Process(target=run_gym, args=(rank, args, params, shared_model, shared_optimizer,))
+        p = mp.Process(target=run_sim, args=(rank, params, shared_model, shared_optimizer,))
         p.start()
         processes.append(p)
 
     for p in processes:
         p.join()
-    '''
+
 if __name__ == "__main__":
     main()

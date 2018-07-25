@@ -86,19 +86,8 @@ class run_agent(object):
         self.cx = Variable(self.cx.data)
         self.hx = Variable(self.hx.data)
 
-        #for step in range(args.num_steps):
-        #    player.action_train()
-        #    if player.done:
-        #        break
-
         if self.done:
-            #state = player.env.reset()
-            #self.state = preprocessing(self.state_done, self.gpu_id)
             self.state = self.state_done
-            #self.state = torch.from_numpy(state).float()
-            #if self.gpu_id >= 0:
-            #    with torch.cuda.device(self.gpu_id):
-            #        self.state = self.state.cuda()
 
         R = torch.zeros(1, 1)
         if not self.done:

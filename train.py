@@ -5,7 +5,7 @@ import torch.optim as optim
 from House3D import objrender, Environment, load_config
 from House3D.roomnav import RoomNavTask
 
-from models import A3C_LSTM_GA, simple_LSTM
+from models import A3C_LSTM_GA
 from agent import run_agent
 from utils import get_house_id, get_house_id_length, get_word_idx
 
@@ -46,7 +46,7 @@ def run_sim(rank, params, shared_model, shared_optimizer, count, lock):
     if gpu_id >= 0:
         torch.cuda.manual_seed(params.seed + rank)
 
-    model = simple_LSTM()
+    model = A3C_LSTM_GA()
     with torch.cuda.device(gpu_id):
         model = model.cuda()
 
@@ -62,11 +62,9 @@ def run_sim(rank, params, shared_model, shared_optimizer, count, lock):
     task = RoomNavTask(env, hardness=params.hardness, segment_input=params.semantic_mode, max_steps=params.max_steps, discrete_action=True)     #reward_type='indicator'
 
     for episode in range(params.max_episode):
-        #Agent.model.train()
         next_observation = task.reset()
         target = task.info['target_room']
         target = get_instruction_idx(target)
-        #target = [1 if targets[i] == target else 0 for i in range(len(targets))]
 
         with torch.cuda.device(gpu_id):
             target = Variable(torch.LongTensor(target)).cuda()
@@ -85,22 +83,15 @@ def run_sim(rank, params, shared_model, shared_optimizer, count, lock):
             act = Agent.action_train(observation, target)
             next_observation, reward, done, info = task.step(actions[act[0]])
 
-            #rew = max(min(reward, 1.0), -1.0)
             rew = np.clip(reward, -1.0, 1.0)
 
-            #total_reward += reward
             Agent.put_reward(rew)
             if num_steps % params.num_steps == 0 or done:
                 if done:
-                    #pdb.set_trace()
                     Agent.done = done
                 with lock:
                     count.value += 1
                 Agent.training(rank, observation, act, reward, next_observation, shared_model, optimizer, params)
-
-                    #n_update = count.value
-                #if n_update % 100 == 0:
-                #    time.sleep(2)
 
             if done:
                 break

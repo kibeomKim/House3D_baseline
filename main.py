@@ -52,7 +52,6 @@ def main():
     shared_model = simple_LSTM()
     shared_model = shared_model.share_memory()
 
-    #shared_optimizer = SharedRMSprop(shared_model.parameters())
     shared_optimizer = SharedAdam(shared_model.parameters(), lr=params.lr, amsgrad=params.amsgrad, weight_decay=params.weight_decay)
     shared_optimizer.share_memory()
     #run_sim(0, params, shared_model, None,  count, lock)

@@ -4,7 +4,7 @@ from torch.autograd import Variable
 from House3D import objrender, Environment, load_config
 from House3D.roomnav import RoomNavTask
 
-from models import A3C_LSTM_GA, simple_LSTM
+from models import A3C_LSTM_GA
 from agent import run_agent
 from utils import get_house_id, get_house_id_length, get_word_idx, setup_logger
 
@@ -46,14 +46,15 @@ def test(rank, params, shared_model, count, lock, best_acc, evaluation=True):
     torch.cuda.manual_seed(params.seed)
 
     with torch.cuda.device(gpu_id):
-        model = simple_LSTM().cuda()
+        model = A3C_LSTM_GA().cuda()
 
     Agent = run_agent(model, gpu_id)
 
-    house_id = rank
-    #house_id = 0
+    house_id = params.house_id
+    if house_id == -1:
+        house_id = rank
     if house_id >= 10:
-        house_id = house_id % 10
+        house_id = house_id % 14
 
     #time.sleep(rank*30)
 
@@ -83,7 +84,6 @@ def test(rank, params, shared_model, count, lock, best_acc, evaluation=True):
             next_observation = task.reset()
             target = task.info['target_room']
             target = get_instruction_idx(target)
-            #target = [1 if targets[i] == target else 0 for i in range(len(targets))]
 
             with torch.cuda.device(gpu_id):
                 target = Variable(torch.LongTensor(target)).cuda()
@@ -100,7 +100,7 @@ def test(rank, params, shared_model, count, lock, best_acc, evaluation=True):
                 next_observation, rew, done, info = task.step(actions[act[0]])
                 total_rew += rew
 
-                if rew == 10:
+                if rew == 10:   # success
                     good = 1
 
                 step += 1

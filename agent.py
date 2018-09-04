@@ -25,15 +25,13 @@ def preprocess(obs):
 class run_agent(object):
     def __init__(self, model, gpu_id):
         self.model = model
-        #self.env = env
-        #self.state = state
         self.hx = None
         self.cx = None
         self.eps_len = 0
-        self.values = []    #deque(maxlen=65)
-        self.log_probs = [] #deque(maxlen=64)
-        self.rewards = []   #deque(maxlen=64)
-        self.entropies = [] #deque(maxlen=64)
+        self.values = []
+        self.log_probs = []
+        self.rewards = []
+        self.entropies = []
         self.done = False
         self.info = None
         self.reward = 0
@@ -42,9 +40,6 @@ class run_agent(object):
         self.n_update = 0
 
     def action_train(self, observation, instruction_idx):
-        #self.model.train()
-        #self.model.eval()
-        #pdb.set_trace()
         self.state = preprocess(observation)
         
         with torch.cuda.device(self.gpu_id):
@@ -61,10 +56,8 @@ class run_agent(object):
         log_prob = log_prob.gather(1, Variable(action))
         action = action.cpu().numpy()
 
-        #self.reward = max(min(self.reward, 1), -1)
         self.values.append(value)
         self.log_probs.append(log_prob)
-        #self.rewards.append(self.reward)
         return np.squeeze(action, axis=0)
 
     def action_test(self, observation, instruction_idx):
@@ -77,11 +70,9 @@ class run_agent(object):
 
                 prob = F.softmax(logit, dim=1)
                 action = prob.max(1)[1].data.cpu().numpy()
-                #action = prob.argmax(dim=1, keepdim=True)
-                #action = prob.multinomial(1).data
-        #action = action.cpu().numpy()
+
         self.eps_len += 1
-        return action #np.squeeze(action, axis=0)
+        return action
 
     def clear_actions(self):
         self.values.clear()
@@ -94,7 +85,6 @@ class run_agent(object):
         self.rewards.append(reward)
 
     def training(self, rank, observation, action, reward, next_observation, shared_model, shared_optimizer, params):
-        #pdb.set_trace()
         self.model.train()
         self.n_update += 1
         self.cx = Variable(self.cx.data)
@@ -127,18 +117,15 @@ class run_agent(object):
             value_loss = value_loss + 0.5 * advantage.pow(2)  #
 
             # Generalized Advantage Estimataion
-            #pdb.set_trace()
             delta_t = params.gamma * self.values[i + 1].data - self.values[i].data + self.rewards[i]
 
             gae = gae * params.gamma * params.tau + delta_t
 
             policy_loss = policy_loss - self.log_probs[i] * Variable(gae) - params.entropy_coef * self.entropies[i]
 
-        #if self.n_update % 100 == 0:
-        #    pdb.set_trace()
         self.model.zero_grad()
-        (policy_loss + params.value_loss_coef * value_loss).backward()   # retain_graph=True,
-        clip_grad_norm_(self.model.parameters(), 1.0)  #1.0
+        (policy_loss + params.value_loss_coef * value_loss).backward()
+        clip_grad_norm_(self.model.parameters(), 1.0)
         ensure_shared_grads(self.model, shared_model, gpu=self.gpu_id >= 0)
         shared_optimizer.step()
         with torch.cuda.device(self.gpu_id):

@@ -57,7 +57,7 @@ def run_sim(rank, params, shared_model, shared_optimizer, count, lock):
         house_id = rank
     if house_id >= 10:
         house_id = house_id % 14
-    n_update = 0
+
     env = Environment(api, get_house_id(house_id), cfg)
     task = RoomNavTask(env, hardness=params.hardness, segment_input=params.semantic_mode, max_steps=params.max_steps, discrete_action=True)     #reward_type='indicator'
 

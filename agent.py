@@ -13,13 +13,7 @@ import pdb
 def preprocess(obs):
     obs = torch.from_numpy(np.array(obs, dtype='f')) / 255.
     state = obs.permute(2, 0, 1).unsqueeze(0)
-    #indices_rgb = torch.tensor([0, 1, 2])
-    #obs_rgb = torch.index_select(obs, 1, indices_rgb) / 255.
-    #obs_rgb.numpy()
-    #indices_depth = torch.tensor([3])
-    #obs_depth = torch.index_select(obs, 1, indices_depth) / 50.
-
-    #state = torch.cat([obs_rgb, obs_depth], 1)
+    
     return state
 
 class run_agent(object):

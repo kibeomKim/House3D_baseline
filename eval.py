@@ -32,6 +32,8 @@ def get_instruction_idx(instruction):
 def test(rank, params, shared_model, count, lock, best_acc, evaluation=True):
     if not os.path.exists('./'+params.weight_dir):
         os.mkdir('./'+params.weight_dir)
+    if not os.path.exists('./log'):
+        os.mkdir('./log')
     logging.basicConfig(filename='./log/'+params.log_file+'.log', level=logging.INFO)
     ptitle('Test Agent: {}'.format(rank))
     gpu_id = params.gpu_ids_test[0]
@@ -120,7 +122,6 @@ def test(rank, params, shared_model, count, lock, best_acc, evaluation=True):
                     if succ_rate >= best_rate:
                         best_rate = succ_rate
                         torch.save(Agent.model.state_dict(), params.weight_dir + 'model' + str(n_update) + '.ckpt')
-                        # /home/kbkim/research/house3d/House3D/training
                         save_model_index += 1
                     #if best_rate > best_acc.value:
                     #    best_acc.value = best_rate
@@ -143,11 +144,3 @@ def test(rank, params, shared_model, count, lock, best_acc, evaluation=True):
                 #"Avg Reward = {:5.3f}\n".format(sum([e[1] for e in eval]) / len(eval)),
                 "Best rate {:3.2f}, Success rate {:3.2f}%".format(best_rate, succ_rate)
             ]))
-
-            '''
-            if len(succ) > 0:
-                print("Avg Success Reward = %.3f" % (sum([e[1] for e in succ]) / len(succ)))
-                txt.write("\nAvg Success Reward = %.3f" % (sum([e[1] for e in succ]) / len(succ)))
-                print("Avg Success Step = %.3f" % (sum([e[0] for e in succ]) / len(succ)))
-                txt.write("\nAvg Success Step = %.3f" % (sum([e[0] for e in succ]) / len(succ)))
-            '''

@@ -9,10 +9,8 @@ pip install -r requirements.txt
 ```
 
 
-
 #### Training
 
 ```
 python main.py 
 ```
-

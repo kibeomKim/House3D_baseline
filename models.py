@@ -101,7 +101,7 @@ class simple_LSTM(torch.nn.Module):
         self.mlp = nn.Linear(512, 192)  #192
 
         self.mlp_policy = nn.Linear(128, 64)
-        self.actor_linear = nn.Linear(64, 5)
+        self.actor_linear = nn.Linear(64, 10)
 
         self.mlp_value = nn.Linear(64, 32) #64
         self.critic_linear = nn.Linear(32, 1)

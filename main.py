@@ -42,12 +42,6 @@ class Params():
         self.weight_decay = 0.00005   #
 
 def main():
-    #parser = argparse.ArgumentParser()
-    #parser.add_argument('obj')
-    #parser.add_argument('--width', type=int, default=400)
-    #parser.add_argument('--height', type=int, default=300)
-    #args = parser.parse_args()
-
     params = Params()
 
     mp.set_start_method('spawn')
@@ -58,8 +52,8 @@ def main():
     shared_model = simple_LSTM()
     shared_model = shared_model.share_memory()
 
-    shared_optimizer = SharedRMSprop(shared_model.parameters())
-    #shared_optimizer = SharedAdam(shared_model.parameters(), lr=params.lr, amsgrad=params.amsgrad, weight_decay=params.weight_decay)
+    #shared_optimizer = SharedRMSprop(shared_model.parameters())
+    shared_optimizer = SharedAdam(shared_model.parameters(), lr=params.lr, amsgrad=params.amsgrad, weight_decay=params.weight_decay)
     shared_optimizer.share_memory()
     #run_sim(0, params, shared_model, None,  count, lock)
     #test(params, shared_model, count, lock, best_acc)

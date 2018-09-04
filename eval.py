@@ -9,14 +9,15 @@ from agent import run_agent
 from utils import get_house_id, get_house_id_length, get_word_idx, setup_logger
 
 import pdb
+import os
 from setproctitle import setproctitle as ptitle
 import time
 import numpy as np
 import logging
 
 targets = ['bedroom', 'kitchen', 'bathroom', 'dining_room', 'living_room']
-#actions = [3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
-actions=[5, 6, 8, 11, 12]
+actions = [3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+#actions=[5, 6, 8, 11, 12]
 
 def get_instruction_idx(instruction):
     instruction_idx = []
@@ -29,6 +30,8 @@ def get_instruction_idx(instruction):
 
 
 def test(rank, params, shared_model, count, lock, best_acc, evaluation=True):
+    if not os.path.exists('./'+params.weight_dir):
+        mkdir('./'+params.weight_dir)
     logging.basicConfig(filename='./log/'+params.log_file+'.log', level=logging.INFO)
     ptitle('Test Agent: {}'.format(rank))
     gpu_id = params.gpu_ids_test[0]

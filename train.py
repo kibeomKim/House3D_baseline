@@ -17,8 +17,8 @@ from collections import deque
 import logging
 
 targets = ['bedroom', 'kitchen', 'bathroom', 'dining_room', 'living_room']
-#actions = [3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
-actions=[5, 6, 8, 11, 12]
+actions = [3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+#actions=[5, 6, 8, 11, 12]
 
 def get_instruction_idx(instruction):
     instruction_idx = []

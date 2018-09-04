@@ -31,7 +31,7 @@ def get_instruction_idx(instruction):
 
 def test(rank, params, shared_model, count, lock, best_acc, evaluation=True):
     if not os.path.exists('./'+params.weight_dir):
-        mkdir('./'+params.weight_dir)
+        os.mkdir('./'+params.weight_dir)
     logging.basicConfig(filename='./log/'+params.log_file+'.log', level=logging.INFO)
     ptitle('Test Agent: {}'.format(rank))
     gpu_id = params.gpu_ids_test[0]

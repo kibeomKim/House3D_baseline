@@ -10,7 +10,7 @@ import time
 
 from train import run_sim
 from shared_optim import SharedRMSprop, SharedAdam
-from models import A3C_LSTM_GA, simple_LSTM
+from models import A3C_LSTM_GA
 from eval import test
 
 targets = ['bedroom', 'kitchen', 'bathroom', 'dining_room', 'living_room']
@@ -37,8 +37,8 @@ class Params():
         self.house_id = -1   #if -1, multi_env
         self.max_steps = 100
         self.semantic_mode = True  #if false, RGB mode on
-        self.log_file = 'train_0904'
-        self.weight_dir = './weight_0904/'
+        self.log_file = 'train_0905'
+        self.weight_dir = './weight_0905/'
         self.weight_decay = 0.00005   #
 
 def main():
@@ -49,7 +49,7 @@ def main():
     best_acc = mp.Value('d', 0.0)
     lock = mp.Lock()
 
-    shared_model = simple_LSTM()
+    shared_model = A3C_LSTM_GA()
     shared_model = shared_model.share_memory()
 
     shared_optimizer = SharedAdam(shared_model.parameters(), lr=params.lr, amsgrad=params.amsgrad, weight_decay=params.weight_decay)

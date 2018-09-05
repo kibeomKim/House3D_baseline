@@ -20,7 +20,7 @@ class Params():
         self.n_process = 18
         self.max_episode = 300000
         self.gamma = 0.95
-        self.entropy_coef = 0.01
+        self.entropy_coef = 0.1
         self.gpu_ids_train = [1, 2, 3]
         self.gpu_ids_test = [0]
         self.lr = 0.001
@@ -37,8 +37,8 @@ class Params():
         self.house_id = -1   #if -1, multi_env
         self.max_steps = 100
         self.semantic_mode = True  #if false, RGB mode on
-        self.log_file = 'train_0905'
-        self.weight_dir = './weight_0905/'
+        self.log_file = 'train_0905_2'
+        self.weight_dir = './weight_0905_2/'
         self.weight_decay = 0.00005   #
 
 def main():

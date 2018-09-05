@@ -36,7 +36,7 @@ def test(rank, params, shared_model, count, lock, best_acc, evaluation=True):
         os.mkdir('./log')
     logging.basicConfig(filename='./log/'+params.log_file+'.log', level=logging.INFO)
     ptitle('Test Agent: {}'.format(rank))
-    gpu_id = params.gpu_ids_test[0]
+    gpu_id = params.gpu_ids_test[rank % len(params.gpu_ids_test)]
 
     api = objrender.RenderAPI(w=params.width, h=params.height, device=gpu_id)
     cfg = load_config('config.json')
@@ -44,19 +44,21 @@ def test(rank, params, shared_model, count, lock, best_acc, evaluation=True):
     save_model_index = 0
     n_update = 0
 
-    torch.manual_seed(params.seed)
-    torch.cuda.manual_seed(params.seed)
+    torch.manual_seed(params.seed + rank)
+    if gpu_id >= 0:
+        torch.cuda.manual_seed(params.seed + rank)
 
+    model = A3C_LSTM_GA()
     with torch.cuda.device(gpu_id):
-        model = A3C_LSTM_GA().cuda()
+        model = model.cuda()
 
     Agent = run_agent(model, gpu_id)
 
     house_id = params.house_id
     if house_id == -1:
         house_id = rank
-    if house_id >= 10:
-        house_id = house_id % 14
+    if house_id >= 18:
+        house_id = house_id % 18
 
     #time.sleep(rank*30)
 
@@ -77,9 +79,11 @@ def test(rank, params, shared_model, count, lock, best_acc, evaluation=True):
         if evaluation is True:
             with lock:
                 n_update = count.value
+            with torch.cuda.device(gpu_id):
                 Agent.model.load_state_dict(shared_model.state_dict())
         else:
-            Agent.model.load_state_dict(shared_model)
+            with torch.cuda.device(gpu_id):
+                Agent.model.load_state_dict(shared_model)
         Agent.model.eval()
 
         for i in range(n_try):
@@ -91,7 +95,7 @@ def test(rank, params, shared_model, count, lock, best_acc, evaluation=True):
                 target = Variable(torch.LongTensor(target)).cuda()
                 Agent.cx = Variable(torch.zeros(1, 256).cuda())
                 Agent.hx = Variable(torch.zeros(1, 256).cuda())
-            Agent.target = target
+                Agent.target = target
             step, total_rew, good = 0, 0, 0
             done = False
 
@@ -121,7 +125,8 @@ def test(rank, params, shared_model, count, lock, best_acc, evaluation=True):
                     #    best_rate = best_acc.value
                     if succ_rate >= best_rate:
                         best_rate = succ_rate
-                        torch.save(Agent.model.state_dict(), params.weight_dir + 'model' + str(n_update) + '.ckpt')
+                        with torch.cuda.device(gpu_id):
+                            torch.save(Agent.model.state_dict(), params.weight_dir + 'model' + str(n_update) + '.ckpt')
                         save_model_index += 1
                     #if best_rate > best_acc.value:
                     #    best_acc.value = best_rate

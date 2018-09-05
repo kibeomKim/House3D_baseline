@@ -21,8 +21,8 @@ class Params():
         self.max_episode = 300000
         self.gamma = 0.95
         self.entropy_coef = 0.01
-        self.gpu_ids_train = [1, 2, 3]
-        self.gpu_ids_test = [0]
+        self.gpu_ids_train = [3, 4, 5, 6, 7]
+        self.gpu_ids_test = [0, 1, 2]
         self.lr = 0.001
         self.tau = 1.0
         self.seed = 1
@@ -63,13 +63,15 @@ def main():
     test_process = 0
 
     for rank in range(params.n_process):
-        if rank % 4 == 0:
-            time.sleep(1)
+        if rank % 2 == 0:
+            #time.sleep(1)
             p = mp.Process(target=test, args=(test_process, params, shared_model, count, lock, best_acc, ))
+            p.start()
+            processes.append(p)
             test_process += 1
-        else:
-            p = mp.Process(target=run_sim, args=(train_process, params, shared_model, shared_optimizer, count, lock, ))
-            train_process += 1
+
+        p = mp.Process(target=run_sim, args=(train_process, params, shared_model, shared_optimizer, count, lock, ))
+        train_process += 1
         p.start()
         processes.append(p)
     '''

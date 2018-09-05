@@ -63,13 +63,15 @@ def main():
     test_process = 0
 
     for rank in range(params.n_process):
-        if rank % 4 == 0:
-            time.sleep(1)
+        if rank % 2 == 0:
+            #time.sleep(1)
             p = mp.Process(target=test, args=(test_process, params, shared_model, count, lock, best_acc, ))
+            p.start()
+            processes.append(p)
             test_process += 1
-        else:
-            p = mp.Process(target=run_sim, args=(train_process, params, shared_model, shared_optimizer, count, lock, ))
-            train_process += 1
+
+        p = mp.Process(target=run_sim, args=(train_process, params, shared_model, shared_optimizer, count, lock, ))
+        train_process += 1
         p.start()
         processes.append(p)
     '''

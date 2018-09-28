@@ -31,7 +31,7 @@ python main.py
 
 #### Evaluation
 
-![](https://github.com/kibeomKim/House3D_baseline/tree/master/img/train_success_rate.png)
+![](https://raw.githubusercontent.com/kibeomKim/House3D_baseline/master/img/train_success_rate.png?token=ATkBLxbiNzijzfOOlUTaLUEXosxiHGa1ks5btsfuwA%3D%3D)
 
 Each line represents each env used in the learning.
 

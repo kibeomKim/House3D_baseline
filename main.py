@@ -17,13 +17,13 @@ targets = ['bedroom', 'kitchen', 'bathroom', 'dining_room', 'living_room']
 
 class Params():
     def __init__(self):
-        self.n_process = 18
+        self.n_process = 20
         self.max_episode = 300000
         self.gamma = 0.95
         self.entropy_coef = 0.1
-        self.gpu_ids_train = [1, 2, 3]
-        self.gpu_ids_test = [0]
-        self.lr = 0.001
+        self.gpu_ids_train = [3, 4, 5, 6, 7, 8]
+        self.gpu_ids_test = [0, 1, 2]
+        self.lr = 1e-3
         self.tau = 1.0
         self.seed = 1
         self.value_loss_coef = 1.0
@@ -32,14 +32,14 @@ class Params():
         self.hardness = 0.6
         self.width = 120
         self.height = 90
-        self.n_eval = 200
+        self.n_eval = 1000
         self.n_test = 2000
         self.house_id = -1   #if -1, multi_env
         self.max_steps = 100
         self.semantic_mode = True  #if false, RGB mode on
-        self.log_file = 'train_0905_2'
-        self.weight_dir = './weight_0905_2/'
-        self.weight_decay = 0.00005   #
+        self.log_file = 'train_0923'
+        self.weight_dir = './weight_0923/'
+        self.weight_decay = 0 #0.00005   #
 
 def main():
     params = Params()
@@ -63,8 +63,7 @@ def main():
     test_process = 0
 
     for rank in range(params.n_process):
-        if rank % 2 == 0:
-            #time.sleep(1)
+        if rank % 3 == 0:
             p = mp.Process(target=test, args=(test_process, params, shared_model, count, lock, best_acc, ))
             p.start()
             processes.append(p)
@@ -74,17 +73,6 @@ def main():
         train_process += 1
         p.start()
         processes.append(p)
-    '''
-    
-    for rank in range(params.n_process):
-        p = mp.Process(target=run_sim, args=(rank, params, shared_model, shared_optimizer, count, lock,))
-        p.start()
-        processes.append(p)
-        if rank % 2 == 0:
-            p = mp.Process(target=test, args=(rank, params, shared_model, count, lock, best_acc,))
-            p.start()
-            processes.append(p)
-    '''
 
     for p in processes:
         p.join()

@@ -55,11 +55,11 @@ def run_sim(rank, params, shared_model, shared_optimizer, count, lock):
     house_id = params.house_id
     if house_id == -1:
         house_id = rank
-    if house_id >= 18:
-        house_id = house_id % 18
+    if house_id >= 20:
+        house_id = house_id % 20
 
     env = Environment(api, get_house_id(house_id), cfg)
-    task = RoomNavTask(env, hardness=params.hardness, segment_input=params.semantic_mode, max_steps=params.max_steps, discrete_action=True)     #reward_type='indicator'
+    task = RoomNavTask(env, hardness=params.hardness, segment_input=params.semantic_mode, max_steps=params.max_steps, discrete_action=True)
 
     for episode in range(params.max_episode):
         next_observation = task.reset()
@@ -80,18 +80,18 @@ def run_sim(rank, params, shared_model, shared_optimizer, count, lock):
         while not done:
             num_steps += 1
             observation = next_observation
-            act = Agent.action_train(observation, target)
+            act, entropy, value, log_prob = Agent.action_train(observation, target)
             next_observation, reward, done, info = task.step(actions[act[0]])
 
             rew = np.clip(reward, -1.0, 1.0)
 
-            Agent.put_reward(rew)
+            Agent.put_reward(rew, entropy, value, log_prob)
             if num_steps % params.num_steps == 0 or done:
                 if done:
                     Agent.done = done
                 with lock:
                     count.value += 1
-                Agent.training(rank, observation, act, reward, next_observation, shared_model, optimizer, params)
+                Agent.training(next_observation, shared_model, optimizer, params)
 
             if done:
                 break

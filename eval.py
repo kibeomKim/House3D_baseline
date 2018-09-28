@@ -57,8 +57,8 @@ def test(rank, params, shared_model, count, lock, best_acc, evaluation=True):
     house_id = params.house_id
     if house_id == -1:
         house_id = rank
-    if house_id >= 18:
-        house_id = house_id % 18
+    if house_id >= 20:
+        house_id = house_id % 20
 
     #time.sleep(rank*30)
 

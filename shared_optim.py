@@ -1,3 +1,8 @@
+'''
+reference from https://github.com/dgriff777/rl_a3c_pytorch/blob/master/shared_optim.py
+'''
+
+
 import math
 import torch
 import torch.optim as optim

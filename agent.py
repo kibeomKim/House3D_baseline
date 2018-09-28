@@ -43,19 +43,17 @@ class run_agent(object):
         prob = F.softmax(logit, dim=1)
         log_prob = F.log_softmax(logit, dim=1)
         entropy = -(log_prob * prob).sum(1)
-        self.entropies.append(entropy)
+        #self.entropies.append(entropy)
 
         action = prob.multinomial(1).data
-        #action = prob.argmax(dim=1, keepdim=True)
         log_prob = log_prob.gather(1, Variable(action))
         action = action.cpu().numpy()
 
-        self.values.append(value)
-        self.log_probs.append(log_prob)
-        return np.squeeze(action, axis=0)
+        #self.values.append(value)
+        #self.log_probs.append(log_prob)
+        return np.squeeze(action, axis=0), entropy, value, log_prob
 
     def action_test(self, observation, instruction_idx):
-        #self.model.eval()
         with torch.cuda.device(self.gpu_id):
             with torch.no_grad():
                 self.state = preprocess(observation)
@@ -75,10 +73,14 @@ class run_agent(object):
         self.entropies.clear()
         return self
 
-    def put_reward(self, reward):
+    def put_reward(self, reward, entropy, value, log_prob):
         self.rewards.append(reward)
 
-    def training(self, rank, observation, action, reward, next_observation, shared_model, shared_optimizer, params):
+        self.entropies.append(entropy)
+        self.values.append(value)
+        self.log_probs.append(log_prob)
+
+    def training(self, next_observation, shared_model, shared_optimizer, params):
         self.model.train()
         self.n_update += 1
         self.cx = Variable(self.cx.data)
@@ -108,7 +110,7 @@ class run_agent(object):
         for i in reversed(range(len(self.rewards))):
             R = params.gamma * R + self.rewards[i]
             advantage = R - self.values[i]
-            value_loss = value_loss + 0.5 * advantage.pow(2)  #
+            value_loss = value_loss + advantage.pow(2)  # 0.5 *
 
             # Generalized Advantage Estimataion
             delta_t = params.gamma * self.values[i + 1].data - self.values[i].data + self.rewards[i]

@@ -29,7 +29,7 @@ and your gpu ids depending on your environment in Class Params() in main.py . (I
 python main.py 
 ```
 
-#### Evaluation
+#### Success rate
 
 ![](https://raw.githubusercontent.com/kibeomKim/House3D_baseline/master/img/train_success_rate.png?token=ATkBLxbiNzijzfOOlUTaLUEXosxiHGa1ks5btsfuwA%3D%3D)
 

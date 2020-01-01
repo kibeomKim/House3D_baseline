@@ -51,17 +51,18 @@ def run_sim(rank, params, shared_model, shared_optimizer, count, lock):
         model = model.cuda()
 
     Agent = run_agent(model, gpu_id)
-
     house_id = params.house_id
     if house_id == -1:
         house_id = rank
-    if house_id >= 20:
-        house_id = house_id % 20
-
-    env = Environment(api, get_house_id(house_id), cfg)
-    task = RoomNavTask(env, hardness=params.hardness, segment_input=params.semantic_mode, max_steps=params.max_steps, discrete_action=True)
 
     for episode in range(params.max_episode):
+        house_id += 1
+        house_id = house_id % 5
+
+        env = Environment(api, get_house_id(house_id), cfg)
+        task = RoomNavTask(env, hardness=params.hardness, segment_input=params.semantic_mode,
+                           max_steps=params.max_steps, discrete_action=True)
+
         next_observation = task.reset()
         target = task.info['target_room']
         target = get_instruction_idx(target)
@@ -83,7 +84,7 @@ def run_sim(rank, params, shared_model, shared_optimizer, count, lock):
             act, entropy, value, log_prob = Agent.action_train(observation, target)
             next_observation, reward, done, info = task.step(actions[act[0]])
 
-            rew = np.clip(reward, -1.0, 1.0)
+            rew = np.clip(reward, -1.0, 10.0)
 
             Agent.put_reward(rew, entropy, value, log_prob)
             if num_steps % params.num_steps == 0 or done:

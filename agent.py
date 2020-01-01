@@ -121,7 +121,7 @@ class run_agent(object):
 
         self.model.zero_grad()
         (policy_loss + params.value_loss_coef * value_loss).backward()
-        clip_grad_norm_(self.model.parameters(), 1.0)
+        clip_grad_norm_(self.model.parameters(), 10.0)
         ensure_shared_grads(self.model, shared_model, gpu=self.gpu_id >= 0)
         shared_optimizer.step()
         with torch.cuda.device(self.gpu_id):

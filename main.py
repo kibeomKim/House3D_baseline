@@ -21,8 +21,8 @@ class Params():
         self.max_episode = 300000
         self.gamma = 0.95
         self.entropy_coef = 0.1
-        self.gpu_ids_train = [3, 4, 5, 6, 7, 8]
-        self.gpu_ids_test = [0, 1, 2]
+        self.gpu_ids_train = [0, 1, 2]
+        self.gpu_ids_test = [3]
         self.lr = 1e-3
         self.tau = 1.0
         self.seed = 1
@@ -32,13 +32,13 @@ class Params():
         self.hardness = 0.6
         self.width = 120
         self.height = 90
-        self.n_eval = 1000
+        self.n_eval = 500
         self.n_test = 2000
         self.house_id = -1   #if -1, multi_env
         self.max_steps = 100
         self.semantic_mode = True  #if false, RGB mode on
-        self.log_file = 'train_0923'
-        self.weight_dir = './weight_0923/'
+        self.log_file = 'baseline_0101'
+        self.weight_dir = './baseline_0101/'
         self.weight_decay = 0 #0.00005   #
 
 def main():
@@ -63,7 +63,7 @@ def main():
     test_process = 0
 
     for rank in range(params.n_process):
-        if rank % 3 == 0:
+        if rank % 5 == 0:
             p = mp.Process(target=test, args=(test_process, params, shared_model, count, lock, best_acc, ))
             p.start()
             processes.append(p)

@@ -28,12 +28,14 @@ class A3C_LSTM_GA(torch.nn.Module):
         ## a3c-lstm network
         self.lstm = nn.LSTMCell(512, 256)
 
-        self.mlp = nn.Linear(512, 192)  #192
+        self.mlp = nn.Linear(512, 256)  #192
 
-        self.mlp_policy = nn.Linear(128, 64)
+        self.mlp_policy = nn.Linear(256, 128)
+        self.mlp_policy2 = nn.Linear(128, 64)
         self.actor_linear = nn.Linear(64, 10)
 
-        self.mlp_value = nn.Linear(64, 32) #64
+        self.mlp_value = nn.Linear(256, 64) #64
+        self.mlp_value2 = nn.Linear(64, 32)
         self.critic_linear = nn.Linear(32, 1)
 
     def forward(self, state, instruction_idx, hx, cx, debugging=False):
@@ -66,13 +68,12 @@ class A3C_LSTM_GA(torch.nn.Module):
         _hx, _cx = self.lstm(lstm_input, (hx, cx))
 
         mlp_input = torch.cat([gated_fusion, _hx], 1)
-        mlp_input = self.mlp(mlp_input)
+        mlp_out = self.mlp(mlp_input)
 
-        policy1, policy2, value = torch.chunk(mlp_input, 3, dim=1)
+        policy = self.mlp_policy(mlp_out)
+        policy = self.mlp_policy2(policy)
 
-        policy = torch.cat([policy1, policy2], 1)
-        policy = self.mlp_policy(policy)
-
-        value = self.mlp_value(value)
+        value = self.mlp_value(mlp_out)
+        value = self.mlp_value2(value)
 
         return self.critic_linear(value), self.actor_linear(policy), _hx, _cx

@@ -92,7 +92,7 @@ def run_sim(rank, params, shared_model, shared_optimizer, count, lock):
                     Agent.done = done
                 with lock:
                     count.value += 1
-                Agent.training(next_observation, shared_model, optimizer, params)
+                Agent.training(next_observation, shared_model, optimizer, params, rank)
 
             if done:
                 break

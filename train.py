@@ -85,6 +85,8 @@ def run_sim(rank, params, shared_model, shared_optimizer, count, lock):
             next_observation, reward, done, info = task.step(actions[act[0]])
 
             rew = np.clip(reward, -1.0, 10.0)
+            if rew != -1.0 and rew != 10.0:     # make sparse reward
+                rew = 0.0
 
             Agent.put_reward(rew, entropy, value, log_prob)
             if num_steps % params.num_steps == 0 or done:
@@ -92,7 +94,7 @@ def run_sim(rank, params, shared_model, shared_optimizer, count, lock):
                     Agent.done = done
                 with lock:
                     count.value += 1
-                Agent.training(next_observation, shared_model, optimizer, params, rank)
+                Agent.training(next_observation, shared_model, optimizer, params)
 
             if done:
                 break

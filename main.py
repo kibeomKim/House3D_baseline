@@ -36,9 +36,9 @@ class Params():
         self.n_test = 2000
         self.house_id = -1   #if -1, multi_env
         self.max_steps = 100
-        self.semantic_mode = True  #if false, RGB mode on
-        self.log_file = 'baseline_0101'
-        self.weight_dir = './baseline_0101/'
+        self.semantic_mode = False  #if false, RGB mode on
+        self.log_file = 'baseline_RBD-D_0107'
+        self.weight_dir = './baseline_RGB-D_0107/'
         self.weight_decay = 0 #0.00005   #
 
 def main():
@@ -62,9 +62,14 @@ def main():
     train_process = 0
     test_process = 0
 
+    # p = mp.Process(target=test, args=(test_process, params, shared_model, count, lock, best_acc,))
+    # p.start()
+    # processes.append(p)
+    # test_process += 1
+
     for rank in range(params.n_process):
-        if rank % 5 == 0:
-            p = mp.Process(target=test, args=(test_process, params, shared_model, count, lock, best_acc, ))
+        if rank < 5:
+            p = mp.Process(target=test, args=(test_process, params, shared_model, count, lock, best_acc,))
             p.start()
             processes.append(p)
             test_process += 1

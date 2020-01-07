@@ -6,7 +6,7 @@ from House3D.roomnav import RoomNavTask
 
 from models import A3C_LSTM_GA
 from agent import run_agent
-from utils import get_house_id, get_house_id_length, get_word_idx, setup_logger
+from utils import get_house_id, get_house_id_length, get_word_idx, setup_logger, get_eval_house_id
 
 import pdb
 import os
@@ -62,7 +62,7 @@ def test(rank, params, shared_model, count, lock, best_acc, evaluation=True):
 
     #time.sleep(rank*30)
 
-    env = Environment(api, get_house_id(house_id), cfg)
+    env = Environment(api, get_eval_house_id(house_id), cfg)
     task = RoomNavTask(env, hardness=params.hardness, segment_input=params.semantic_mode, max_steps=params.max_steps, discrete_action=True)     #reward_type='indicator'
 
     start_time = time.time()
@@ -131,21 +131,17 @@ def test(rank, params, shared_model, count, lock, best_acc, evaluation=True):
                     #if best_rate > best_acc.value:
                     #    best_acc.value = best_rate
 
-            print(" ".join([
+            avg_reward = sum([e[1] for e in eval]) / len(eval)
+            avg_length = sum([e[0] for e in eval]) / len(eval)
+            msg = " ".join([
                 "++++++++++ Task Stats +++++++++++\n",
-                "Time {}\n".format(time.strftime("%Hh %Mm %Ss", time.gmtime(time.time() - start_time))),
+                "Time {}\n".format(time.strftime("%dd %Hh %Mm %Ss", time.gmtime(time.time() - start_time))),
                 "Episode Played: {:d}\n".format(len(eval)),
                 "N_Update = {:d}\n".format(n_update),
                 "House id: {:d}\n".format(house_id),
-                #"Avg Reward = {:5.3f}\n".format(sum([e[1] for e in eval]) / len(eval)),
+                "Avg Reward = {:5.3f}\n".format(avg_reward),
+                "Avg Length = {:.3f}\n".format(avg_length),
                 "Best rate {:3.2f}, Success rate {:3.2f}%".format(best_rate, succ_rate)
-            ]))
-            logging.info(" ".join([
-                "++++++++++ Task Stats +++++++++++\n",
-                "Time {}\n".format(time.strftime("%Hh %Mm %Ss", time.gmtime(time.time() - start_time))),
-                "Episode Played: {:d}\n".format(len(eval)),
-                "N_Update = {:d}\n".format(n_update),
-                "House id: {:d}\n".format(house_id),
-                #"Avg Reward = {:5.3f}\n".format(sum([e[1] for e in eval]) / len(eval)),
-                "Best rate {:3.2f}, Success rate {:3.2f}%".format(best_rate, succ_rate)
-            ]))
+            ])
+            print(msg)
+            logging.info(msg)

@@ -28,26 +28,21 @@ class A3C_LSTM_GA(torch.nn.Module):
         ## a3c-lstm network
         self.lstm = nn.LSTMCell(512, 256)
 
-        self.mlp = nn.Linear(512, 256)  #192
-
-        self.mlp_policy = nn.Linear(256, 128)
+        self.mlp_policy1 = nn.Linear(512, 128)
         self.mlp_policy2 = nn.Linear(128, 64)
-        self.actor_linear = nn.Linear(64, 10)
+        self.policy = nn.Linear(64, 12)
 
-        self.mlp_value = nn.Linear(256, 64) #64
-        self.mlp_value2 = nn.Linear(64, 32)
-        self.critic_linear = nn.Linear(32, 1)
+        self.mlp_value1 = nn.Linear(512, 64)
+        self.mlp_value2 = nn.Linear(64, 32)  # 64
+        self.value = nn.Linear(32, 1)
 
-    def forward(self, state, instruction_idx, hx, cx, debugging=False):
+    def forward(self, state, instruction_idx, hx, cx):
         x = state
 
         x = F.relu(self.batchnorm1(self.conv1(x)))
         x = F.relu(self.batchnorm2(self.conv2(x)))
         x = F.relu(self.batchnorm3(self.conv3(x)))
         x = F.relu(self.batchnorm4(self.conv4(x)))
-
-        if debugging is True:
-            pdb.set_trace()
 
         x = x.view(x.size(0), -1)
         img_feat = F.relu(self.fc(x))
@@ -68,12 +63,11 @@ class A3C_LSTM_GA(torch.nn.Module):
         _hx, _cx = self.lstm(lstm_input, (hx, cx))
 
         mlp_input = torch.cat([gated_fusion, _hx], 1)
-        mlp_out = self.mlp(mlp_input)
 
-        policy = self.mlp_policy(mlp_out)
-        policy = self.mlp_policy2(policy)
+        policy = F.relu(self.mlp_policy1(mlp_input))
+        policy = F.relu(self.mlp_policy2(policy))
 
-        value = self.mlp_value(mlp_out)
-        value = self.mlp_value2(value)
+        value = F.relu(self.mlp_value1(mlp_input))
+        value = F.relu(self.mlp_value2(value))
 
-        return self.critic_linear(value), self.actor_linear(policy), _hx, _cx
+        return self.value(value), self.policy(policy), _hx, _cx

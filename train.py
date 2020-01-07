@@ -17,7 +17,7 @@ from collections import deque
 import logging
 
 targets = ['bedroom', 'kitchen', 'bathroom', 'dining_room', 'living_room']
-actions = [3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+actions = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
 #actions=[5, 6, 8, 11, 12]
 
 def get_instruction_idx(instruction):
@@ -52,17 +52,17 @@ def run_sim(rank, params, shared_model, shared_optimizer, count, lock):
 
     Agent = run_agent(model, gpu_id)
     house_id = params.house_id
+
     if house_id == -1:
         house_id = rank
+    if house_id > 20:
+        house_id = house_id % 20
 
-    for episode in range(params.max_episode):
-        house_id += 1
-        house_id = house_id % 5
+    env = Environment(api, get_house_id(house_id), cfg)
+    task = RoomNavTask(env, hardness=params.hardness, segment_input=params.semantic_mode,
+                       max_steps=params.max_steps, discrete_action=True)
 
-        env = Environment(api, get_house_id(house_id), cfg)
-        task = RoomNavTask(env, hardness=params.hardness, segment_input=params.semantic_mode,
-                           max_steps=params.max_steps, discrete_action=True)
-
+    for episode in range(params.max_episode):        
         next_observation = task.reset()
         target = task.info['target_room']
         target = get_instruction_idx(target)

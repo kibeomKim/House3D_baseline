@@ -19,6 +19,9 @@ houses = ['00065ecbdd7300d35ef4328ffe871505','31966fdc9f9c87862989fae8ae906295',
         #a7e248efcdb6040c92ac0cdc3b2351a6
         #2364b7dcc432c6d6dcc59dba617b5f4b
 
+houses_eval = ['7995c2a93311717a3a9c48d789563590', '32e53679b33adfcc5a5660b8c758cc96', 'ff32675f2527275171555259b4a1b3c3',
+               'a7e248efcdb6040c92ac0cdc3b2351a6', '2364b7dcc432c6d6dcc59dba617b5f4b', '775941abe94306edc1b5820e3a992d75']
+
 def setup_logger(logger_name, log_file, level=logging.INFO):
     l = logging.getLogger(logger_name)
     formatter = logging.Formatter('%(asctime)s : %(message)s')
@@ -70,6 +73,9 @@ def weights_init(m):
 
 def get_house_id(index):
     return houses[index]
+
+def get_eval_house_id(index):
+    return houses_eval[index]
 
 def get_house_id_length():
     return len(houses)

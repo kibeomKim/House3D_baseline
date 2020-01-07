@@ -1,6 +1,6 @@
 {
-    "colorFile": "/home/kbkim/House3D/House3D/metadata/colormap_coarse.csv",
-    "roomTargetFile": "/home/kbkim/House3D/House3D/metadata/room_target_object_map.csv",
-    "modelCategoryFile": "/home/kbkim/House3D/House3D/metadata/ModelCategoryMapping.csv",
-    "prefix": "/home/kbkim/suncg_data/house/"
+    "colorFile": "/home/kbkim/research/house3d/House3D_new/House3D/House3D/metadata/colormap_coarse.csv",
+    "roomTargetFile": "/home/kbkim/research/house3d/House3D_new/House3D/House3D/metadata/room_target_object_map.csv",
+    "modelCategoryFile": "/home/kbkim/research/house3d/House3D_new/House3D/House3D/metadata/ModelCategoryMapping.csv",
+    "prefix": "/home/kbkim/research/house3d/data/house/"
 }

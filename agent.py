@@ -11,7 +11,7 @@ import pdb
 #numpy.set_printoptions(threshold=numpy.nan)
 
 def preprocess(obs):
-    obs = torch.from_numpy(np.array(obs, dtype='f')) / 255.
+    obs = torch.from_numpy(np.array(obs, dtype=np.float32)) / 255.
     state = obs.permute(2, 0, 1).unsqueeze(0)
     
     return state
@@ -40,8 +40,8 @@ class run_agent(object):
             obs = Variable(torch.FloatTensor(self.state)).cuda()
         value, logit, self.hx, self.cx = self.model(obs, instruction_idx, self.hx, self.cx)
 
-        prob = F.softmax(logit, dim=1)
-        log_prob = F.log_softmax(logit, dim=1)
+        prob = F.softmax(logit, dim=-1)
+        log_prob = F.log_softmax(logit, dim=-1)
         entropy = -(log_prob * prob).sum(1)
         #self.entropies.append(entropy)
 

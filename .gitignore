@@ -1,5 +1,5 @@
 /__pycache__
 /log/*
 /weight*
-*.json
+config.json
 baseline_*/

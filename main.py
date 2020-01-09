@@ -32,13 +32,13 @@ class Params():
         self.hardness = 0.6
         self.width = 120
         self.height = 90
-        self.n_eval = 500
+        self.n_eval = 1000
         self.n_test = 2000
         self.house_id = -1   #if -1, multi_env
         self.max_steps = 100
         self.semantic_mode = False  #if false, RGB mode on
-        self.log_file = 'baseline_RBD-D_0107'
-        self.weight_dir = './baseline_RGB-D_0107/'
+        self.log_file = 'baseline_sparse_RBD-D_0109'
+        self.weight_dir = './baseline_sparse_RGB-D_0109/'
         self.weight_decay = 0 #0.00005   #
 
 def main():

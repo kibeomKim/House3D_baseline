@@ -40,8 +40,8 @@ class run_agent(object):
             obs = Variable(torch.FloatTensor(self.state)).cuda()
         value, logit, self.hx, self.cx = self.model(obs, instruction_idx, self.hx, self.cx)
 
-        prob = F.softmax(logit, dim=-1)
-        log_prob = F.log_softmax(logit, dim=-1)
+        prob = F.softmax(logit, dim=1)
+        log_prob = F.log_softmax(logit, dim=1)
         entropy = -(log_prob * prob).sum(1)
         #self.entropies.append(entropy)
 

@@ -62,7 +62,7 @@ def test(rank, params, shared_model, count, lock, best_acc, evaluation=True):
 
     #time.sleep(rank*30)
 
-    env = Environment(api, get_eval_house_id(house_id), cfg)
+    env = Environment(api, get_house_id(house_id), cfg)
     task = RoomNavTask(env, hardness=params.hardness, segment_input=params.semantic_mode, max_steps=params.max_steps, discrete_action=True)     #reward_type='indicator'
 
     start_time = time.time()

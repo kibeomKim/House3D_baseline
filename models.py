@@ -47,19 +47,15 @@ class A3C_LSTM_GA(torch.nn.Module):
         x = x.view(x.size(0), -1)
         img_feat = F.relu(self.fc(x))
 
-        # Get the instruction representation
         word_embedding = self.embedding(instruction_idx)
         word_embedding = word_embedding.view(word_embedding.size(0), -1)
 
-        ## calculate gated attention
         word_embedding = self.target_att_linear(word_embedding)
         gated_att = torch.sigmoid(word_embedding)
 
-        ## apply gated attention
         gated_fusion = torch.mul(img_feat, gated_att)
-        lstm_input = torch.cat([gated_fusion, gated_att], 1)
+        lstm_input = torch.cat([gated_fusion, word_embedding], 1)
 
-        ## calculate action probability and value function
         _hx, _cx = self.lstm(lstm_input, (hx, cx))
 
         mlp_input = torch.cat([gated_fusion, _hx], 1)

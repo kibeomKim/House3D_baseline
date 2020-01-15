@@ -22,8 +22,8 @@ class Params():
         self.n_test = 2000
         self.max_steps = 100
         self.semantic_mode = False  #if false, RGB mode on
-        self.log_file = 'baseline_dense_semantic_0113_test'
-        self.weight_dir = './baseline_dense_semantic_0113/'
+        self.log_file = 'baseline_dense_RGB-D_0113_test'
+        self.weight_dir = './baseline_dense_RGB-D_0113/'
 
 def main():
     params = Params()
@@ -35,11 +35,11 @@ def main():
 
     mp.set_start_method('spawn')
 
-    test_files = ['model8670790.ckpt', 'model8308872.ckpt', 'model8242075.ckpt', 'model8223933.ckpt', 'model8203542.ckpt',
-                  'model8119953.ckpt', 'model8098581.ckpt', 'model8089304.ckpt', 'model8076064.ckpt', 'model8073655.ckpt',
-                  'model7930654.ckpt', 'model7866130.ckpt', 'model7528401.ckpt', 'model7492740.ckpt', 'model7376527.ckpt',
-                  'model7236534.ckpt', 'model7220560.ckpt', 'model6508117.ckpt', 'model6415842.ckpt', 'model6367304.ckpt',
-                  'model6218524.ckpt', 'model6214230.ckpt', 'model6212339.ckpt', 'model6204624.ckpt', 'model6159519.ckpt']
+    test_files = ['model7950657.ckpt', 'model7783645.ckpt', 'model7762120.ckpt', 'model7695404.ckpt', 'model7582072.ckpt',
+                  'model7519625.ckpt', 'model7506695.ckpt', 'model7410288.ckpt', 'model7118813.ckpt', 'model7009886.ckpt',
+                  'model6912503.ckpt', 'model6760726.ckpt', 'model6635764.ckpt', 'model6622441.ckpt', 'model6577278.ckpt',
+                  'model6546240.ckpt', 'model6515106.ckpt', 'model6359619.ckpt', 'model6149225.ckpt', 'model6146211.ckpt',
+                  'model6137830.ckpt', 'model6122163.ckpt', 'model6090876.ckpt', 'model6089290.ckpt', 'model6060824.ckpt']
 
     for ckpt in test_files:
         init_msg = " ".join([
@@ -82,9 +82,9 @@ def main():
         msg = " ".join([
             "++++++++++++++++++++ Total Task Stats +++++++++++++++++++++\n",
             "Seen Avg Length = {:.3f}\n".format(seen_length.value/(20 * params.n_test)),
-            "Seen Total Success rate {:3.2f}%".format(seen_succ.value/(20 * params.n_test)),
+            "Seen Total Success rate {:3.2f}%".format(100 * seen_succ.value/(20 * params.n_test)),
             "UnSeen Avg Length = {:.3f}\n".format(unseen_length.value/(50 * params.n_test)),
-            "UnSeen Total Success rate {:3.2f}%\n\n".format(unseen_succ.value/(50 * params.n_test)),
+            "UnSeen Total Success rate {:3.2f}%\n\n".format(100 * unseen_succ.value/(50 * params.n_test)),
         ])
         print(msg)
         logging.info(msg)

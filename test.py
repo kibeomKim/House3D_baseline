@@ -126,9 +126,9 @@ def run_test(rank, params, loaded_model, lock, seen_succ, seen_length, unseen_su
             logging.info(msg)
             with lock:
                 if seen:
-                    seen_succ += len(succ)
-                    seen_length += sum([e[0] for e in eval])
+                    seen_succ.value += len(succ)
+                    seen_length.value += sum([e[0] for e in eval])
                 else:
-                    unseen_succ += len(succ)
-                    unseen_length += sum([e[0] for e in eval])
+                    unseen_succ.value += len(succ)
+                    unseen_length.value += sum([e[0] for e in eval])
             n_test += 1

@@ -81,10 +81,10 @@ def main():
 
         msg = " ".join([
             "++++++++++++++++++++ Total Task Stats +++++++++++++++++++++\n",
-            "Seen Avg Length = {:.3f}\n".format(seen_length/(20 * params.n_test)),
-            "Seen Total Success rate {:3.2f}%".format(seen_succ/(20 * params.n_test)),
-            "UnSeen Avg Length = {:.3f}\n".format(unseen_length/(50 * params.n_test)),
-            "UnSeen Total Success rate {:3.2f}%\n\n".format(unseen_succ/(50 * params.n_test)),
+            "Seen Avg Length = {:.3f}\n".format(seen_length.value/(20 * params.n_test)),
+            "Seen Total Success rate {:3.2f}%".format(seen_succ.value/(20 * params.n_test)),
+            "UnSeen Avg Length = {:.3f}\n".format(unseen_length.value/(50 * params.n_test)),
+            "UnSeen Total Success rate {:3.2f}%\n\n".format(unseen_succ.value/(50 * params.n_test)),
         ])
         print(msg)
         logging.info(msg)

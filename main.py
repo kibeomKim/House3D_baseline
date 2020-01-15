@@ -37,8 +37,8 @@ class Params():
         self.house_id = -1   #if -1, multi_env
         self.max_steps = 100
         self.semantic_mode = False  #if false, RGB mode on
-        self.log_file = 'baseline_dense_RGB-D_0113'
-        self.weight_dir = './baseline_dense_RGB-D_0113/'
+        self.log_file = 'baseline_dense_semantic_0113'
+        self.weight_dir = './baseline_dense_semantic_0113/'
         self.weight_decay = 0 #0.00005   #
 
 def main():

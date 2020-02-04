@@ -8,7 +8,7 @@ import argparse
 import logging
 import time
 
-from train import run_sim
+from train_eval import run_sim
 from shared_optim import SharedRMSprop, SharedAdam
 from models import A3C_LSTM_GA
 from eval import test
@@ -17,11 +17,11 @@ targets = ['bedroom', 'kitchen', 'bathroom', 'dining_room', 'living_room']
 
 class Params():
     def __init__(self):
-        self.n_process = 20
+        self.n_process = 32
         self.max_episode = 300000
         self.gamma = 0.95
         self.entropy_coef = 0.1
-        self.gpu_ids_train = [0, 1, 2]
+        self.gpu_ids_train = [0, 1, 2, 3]
         self.gpu_ids_test = [3]
         self.lr = 1e-3
         self.tau = 1.0
@@ -30,15 +30,16 @@ class Params():
         self.amsgrad = True
         self.num_steps = 30
         self.hardness = 0.6
+        self.difficulty = True  # True calls easy set
         self.width = 120
         self.height = 90
-        self.n_eval = 1000
+        self.n_eval = 500
         self.n_test = 2000
         self.house_id = -1   #if -1, multi_env
         self.max_steps = 100
         self.semantic_mode = False  #if false, RGB mode on
-        self.log_file = 'baseline_dense_semantic_0113'
-        self.weight_dir = './baseline_dense_semantic_0113/'
+        self.log_file = 'baseline_sparse32_easy_allstep_0204'
+        self.weight_dir = './baseline_sparse32_easy_allstep_0204/'
         self.weight_decay = 0 #0.00005   #
 
 def main():
@@ -68,11 +69,11 @@ def main():
     # test_process += 1
 
     for rank in range(params.n_process):
-        if rank < 5:
-            p = mp.Process(target=test, args=(test_process, params, shared_model, count, lock, best_acc,))
-            p.start()
-            processes.append(p)
-            test_process += 1
+        # if rank < 5:
+        #     p = mp.Process(target=test, args=(test_process, params, shared_model, count, lock, best_acc,))
+        #     p.start()
+        #     processes.append(p)
+        #     test_process += 1
 
         p = mp.Process(target=run_sim, args=(train_process, params, shared_model, shared_optimizer, count, lock, ))
         train_process += 1

@@ -22,8 +22,8 @@ class Params():
         self.n_test = 2000
         self.max_steps = 100
         self.semantic_mode = False  #if false, RGB mode on
-        self.log_file = 'baseline_dense_RGB-D_0113_test'
-        self.weight_dir = './baseline_dense_RGB-D_0113/'
+        self.log_file = 'baseline_dense_allstep_0127_test'
+        self.weight_dir = './baseline_dense_allstep_0127/'
 
 def main():
     params = Params()
@@ -35,11 +35,11 @@ def main():
 
     mp.set_start_method('spawn')
 
-    test_files = ['model7950657.ckpt', 'model7783645.ckpt', 'model7762120.ckpt', 'model7695404.ckpt', 'model7582072.ckpt',
-                  'model7519625.ckpt', 'model7506695.ckpt', 'model7410288.ckpt', 'model7118813.ckpt', 'model7009886.ckpt',
-                  'model6912503.ckpt', 'model6760726.ckpt', 'model6635764.ckpt', 'model6622441.ckpt', 'model6577278.ckpt',
-                  'model6546240.ckpt', 'model6515106.ckpt', 'model6359619.ckpt', 'model6149225.ckpt', 'model6146211.ckpt',
-                  'model6137830.ckpt', 'model6122163.ckpt', 'model6090876.ckpt', 'model6089290.ckpt', 'model6060824.ckpt']
+    test_files = ['model3115920.ckpt', 'model3070538.ckpt', 'model3067604.ckpt', 'model3043059.ckpt', 'model2994943.ckpt',
+                  'model2983232.ckpt', 'model2912569.ckpt', 'model2849037.ckpt', 'model2741430.ckpt', 'model2696001.ckpt',
+                  'model2685407.ckpt', 'model2659828.ckpt', 'model2626517.ckpt', 'model2621966.ckpt', 'model2583286.ckpt',
+                  'model2583025.ckpt', 'model2548002.ckpt', 'model2545110.ckpt', 'model2484209.ckpt', 'model2461454.ckpt',
+                  'model2449942.ckpt', 'model2444853.ckpt', 'model2424837.ckpt', 'model2414733.ckpt', 'model2383330.ckpt']
 
     for ckpt in test_files:
         init_msg = " ".join([

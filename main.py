@@ -8,7 +8,8 @@ import argparse
 import logging
 import time
 
-from train import run_sim
+from actors import run_sim
+from learner import learning
 from shared_optim import SharedRMSprop, SharedAdam
 from models import A3C_LSTM_GA
 from eval import test
@@ -17,11 +18,11 @@ targets = ['bedroom', 'kitchen', 'bathroom', 'dining_room', 'living_room']
 
 class Params():
     def __init__(self):
-        self.n_process = 20
-        self.max_episode = 300000
+        self.n_process = 50
+        self.max_episode = 900000
         self.gamma = 0.95
         self.entropy_coef = 0.1
-        self.gpu_ids_train = [0, 1, 2]
+        self.gpu_ids_train = [0, 1, 2, 3]
         self.gpu_ids_test = [3]
         self.lr = 1e-3
         self.tau = 1.0
@@ -32,28 +33,35 @@ class Params():
         self.hardness = 0.6
         self.width = 120
         self.height = 90
-        self.n_eval = 1000
+        self.n_eval = 500
         self.n_test = 2000
-        self.house_id = -1   #if -1, multi_env
+        self.house_id = 0   #if -1, multi_env
         self.max_steps = 100
         self.semantic_mode = False  #if false, RGB mode on
-        self.log_file = 'baseline_dense_semantic_0113'
-        self.weight_dir = './baseline_dense_semantic_0113/'
+        self.log_file = 'baseline_sparse_easy50_0205'
+        self.weight_dir = './baseline_sparse_easy50_0205/'
         self.weight_decay = 0 #0.00005   #
 
 def main():
     params = Params()
 
     mp.set_start_method('spawn')
-    count = mp.Value('i', 0)
-    best_acc = mp.Value('d', 0.0)
     lock = mp.Lock()
 
-    shared_model = A3C_LSTM_GA()
-    shared_model = shared_model.share_memory()
+    actions = mp.Array('i', [-1] * params.n_process, lock=lock)
+    count = mp.Value('i', 0)
+    best_acc = mp.Value('d', 0.0)
 
-    shared_optimizer = SharedAdam(shared_model.parameters(), lr=params.lr, amsgrad=params.amsgrad, weight_decay=params.weight_decay)
-    shared_optimizer.share_memory()
+
+    state_Queue = mp.Queue()
+    action_done = mp.Queue()
+    reward_Queue = mp.Queue()
+
+    # shared_model = A3C_LSTM_GA()
+    # shared_model = shared_model.share_memory()
+    #
+    # shared_optimizer = SharedAdam(shared_model.parameters(), lr=params.lr, amsgrad=params.amsgrad, weight_decay=params.weight_decay)
+    # shared_optimizer.share_memory()
     #run_sim(0, params, shared_model, None,  count, lock)
     #test(params, shared_model, count, lock, best_acc)
 
@@ -62,19 +70,13 @@ def main():
     train_process = 0
     test_process = 0
 
-    # p = mp.Process(target=test, args=(test_process, params, shared_model, count, lock, best_acc,))
-    # p.start()
-    # processes.append(p)
+    p = mp.Process(target=learning, args=(params, state_Queue, action_done, actions, reward_Queue,))
+    p.start()
+    processes.append(p)
     # test_process += 1
 
     for rank in range(params.n_process):
-        if rank < 5:
-            p = mp.Process(target=test, args=(test_process, params, shared_model, count, lock, best_acc,))
-            p.start()
-            processes.append(p)
-            test_process += 1
-
-        p = mp.Process(target=run_sim, args=(train_process, params, shared_model, shared_optimizer, count, lock, ))
+        p = mp.Process(target=run_sim, args=(train_process, params, state_Queue, action_done, actions, reward_Queue, lock, ))
         train_process += 1
         p.start()
         processes.append(p)

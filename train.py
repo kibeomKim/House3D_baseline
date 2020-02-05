@@ -89,7 +89,7 @@ def run_sim(rank, params, shared_model, shared_optimizer, count, lock):
             #     rew = 0.0
 
             Agent.put_reward(rew, entropy, value, log_prob)
-            if num_steps % params.num_steps == 0 or done:
+            if done:    # num_steps % params.num_steps == 0 or 
                 if done:
                     Agent.done = done
                 with lock:

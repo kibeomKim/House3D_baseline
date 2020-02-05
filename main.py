@@ -8,8 +8,7 @@ import argparse
 import logging
 import time
 
-from actors import run_sim
-from learner import learning
+from train_eval import run_sim
 from shared_optim import SharedRMSprop, SharedAdam
 from models import A3C_LSTM_GA
 from eval import test
@@ -31,6 +30,7 @@ class Params():
         self.amsgrad = True
         self.num_steps = 30
         self.hardness = 0.6
+        self.difficulty = True  # True calls easy set
         self.width = 120
         self.height = 90
         self.n_eval = 500
@@ -77,6 +77,7 @@ def main():
 
     for rank in range(params.n_process):
         p = mp.Process(target=run_sim, args=(train_process, params, state_Queue, action_done, actions, reward_Queue, lock, ))
+
         train_process += 1
         p.start()
         processes.append(p)

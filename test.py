@@ -39,13 +39,13 @@ def run_test(rank, params, loaded_model, lock, seen_succ, seen_length, unseen_su
 
     torch.manual_seed(params.seed + rank)
     if gpu_id >= 0:
-        torch.cuda.manual_seed(params.seed + rank)
-
-    load_model = torch.load(loaded_model, map_location=lambda storage, loc: storage.cuda(gpu_id))
+        with torch.cuda.device(gpu_id):
+            torch.cuda.manual_seed(params.seed + rank)
 
     model = A3C_LSTM_GA()
     with torch.cuda.device(gpu_id):
         model = model.cuda()
+        load_model = torch.load(loaded_model, map_location=lambda storage, loc: storage.cuda(gpu_id))
         model.load_state_dict(load_model)
         model.eval()
 

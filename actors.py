@@ -41,7 +41,7 @@ def run_sim(rank, params, state_Queue, action_done, actions, reward_Queue, lock)
     if house_id > 20:
         house_id = house_id % 20
 
-    env = Environment(api, get_house_id(house_id), cfg)
+    env = Environment(api, get_house_id(house_id, params.difficulty), cfg)
     task = RoomNavTask(env, hardness=params.hardness, segment_input=params.semantic_mode,
                        max_steps=params.max_steps, discrete_action=True)
 

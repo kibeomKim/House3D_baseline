@@ -38,8 +38,8 @@ def run_sim(rank, params, state_Queue, action_done, actions, reward_Queue, lock)
 
     if house_id == -1:
         house_id = rank
-    if house_id > 20:
-        house_id = house_id % 20
+    if house_id > 50:
+        house_id = house_id % 50
 
     env = Environment(api, get_house_id(house_id, params.difficulty), cfg)
     task = RoomNavTask(env, hardness=params.hardness, segment_input=params.semantic_mode,
@@ -79,8 +79,11 @@ def run_sim(rank, params, state_Queue, action_done, actions, reward_Queue, lock)
             total_reward += reward
             # if rew != -1.0 and rew != 10.0:     # make sparse reward
             #     rew = 0.0
-            rew = rank, done, reward
-            reward_Queue.put(rew)
+            rew = [rank, done, reward]
+            # print("send - rank: {:d}, reward: {:3.2f}".format(rank, reward))
+            reward_Queue.put(rew)    # no wait
+
+            reward_Queue.join()
 
             if done:
                 break

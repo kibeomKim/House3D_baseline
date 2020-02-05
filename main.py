@@ -36,7 +36,7 @@ class Params():
         self.height = 90
         self.n_eval = 500
         self.n_test = 2000
-        self.house_id = 0   #if -1, multi_env
+        self.house_id = -1   #if -1, multi_env
         self.max_steps = 100
         self.semantic_mode = False  #if false, RGB mode on
         self.log_file = 'baseline_sparse_easy50_0205'
@@ -54,9 +54,9 @@ def main():
     best_acc = mp.Value('d', 0.0)
 
 
-    state_Queue = mp.Queue()
-    action_done = mp.Queue()
-    reward_Queue = mp.Queue()
+    state_Queue = mp.SimpleQueue()
+    action_done = mp.SimpleQueue()
+    reward_Queue = mp.JoinableQueue()
 
     # shared_model = A3C_LSTM_GA()
     # shared_model = shared_model.share_memory()
@@ -71,7 +71,7 @@ def main():
     train_process = 0
     test_process = 0
 
-    p = mp.Process(target=learning, args=(params, state_Queue, action_done, actions, reward_Queue,))
+    p = mp.Process(target=learning, args=(params, state_Queue, action_done, actions, reward_Queue, ))
     p.start()
     processes.append(p)
     # test_process += 1

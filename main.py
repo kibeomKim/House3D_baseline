@@ -8,7 +8,8 @@ import argparse
 import logging
 import time
 
-from train_eval import run_sim
+from learner import learning
+from actors import run_sim
 from shared_optim import SharedRMSprop, SharedAdam
 from models import A3C_LSTM_GA
 from eval import test

@@ -62,10 +62,10 @@ def run_sim(rank, params, state_Queue, action_done, actions, reward_Queue, lock)
             observation = next_observation
             state = rank, [observation, target]
             state_Queue.put(state)
-            # act, entropy, value, log_prob = Agent.action_train(observation, target)
 
-            action_done.get()   # action done
+            state_Queue.join()
 
+            # action_done.get()   # action done
             action = actions[rank]
             if action == 99:
                 test = True
@@ -77,11 +77,10 @@ def run_sim(rank, params, state_Queue, action_done, actions, reward_Queue, lock)
             if reward != -1.0 and reward != 10.0:   # make sparse reward
                 reward = 0.0
             total_reward += reward
-            # if rew != -1.0 and rew != 10.0:     # make sparse reward
-            #     rew = 0.0
+           
             rew = [rank, done, reward]
             # print("send - rank: {:d}, reward: {:3.2f}".format(rank, reward))
-            reward_Queue.put(rew)    # no wait
+            reward_Queue.put(rew)
 
             reward_Queue.join()
 

@@ -54,7 +54,7 @@ def main():
     best_acc = mp.Value('d', 0.0)
 
 
-    state_Queue = mp.SimpleQueue()
+    state_Queue = mp.JoinableQueue()
     action_done = mp.SimpleQueue()
     reward_Queue = mp.JoinableQueue()
 

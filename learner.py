@@ -50,15 +50,17 @@ def getReward(n_process, reward_Queue, list_dones):
 
     return torch.from_numpy(np.array(list_rewards, dtype=np.float32)), list_dones, masks
 
-def putActions(n_process, inference, actions, action_done):
+def putActions(n_process, inference, actions, state_Queue):
     for i in range(n_process):
         actions[i] = action_list[inference[i]]
     # actions = Agent.action_train(list_obs, list_target)
 
     for i in range(n_process):
-        action_done.put([0])
+        state_Queue.task_done()
 
-def callReset(n_process, actions, action_done):
+    return actions
+
+def callReset(n_process, actions, state_Queue):
     for i in range(n_process):
         actions[i] = 99  # reset for training
         # reward_Queue.task_done()
@@ -66,9 +68,11 @@ def callReset(n_process, actions, action_done):
     test_succ = [0] * n_process
 
     for i in range(n_process):
-        action_done.put([0])
+        state_Queue.task_done()
+    # for i in range(n_process):
+    #     action_done.put([0])
 
-    return test_done, test_succ
+    return actions, test_done, test_succ
 
 def DoneOrNot(n_process, test_done, n_eval):
     for i in range(n_process):
@@ -80,9 +84,9 @@ def DoneOrNot(n_process, test_done, n_eval):
 
 def EnvReset(n_process, state_Queue, action_done, list_dones, actions):
     list_obs, list_target, list_dones = getState(n_process, state_Queue, list_dones)
-    test_done, test_succ = callReset(n_process, actions, action_done)
+    actions, test_done, test_succ = callReset(n_process, actions, state_Queue)
     list_rewards = [None] * n_process
-    return test_done, test_succ, list_rewards
+    return actions, test_done, test_succ, list_rewards
 
 def writeResult(n_process, test_done, test_succ, best_rate, Agent, params, n_update, start_time, logging):
     total = 0
@@ -139,7 +143,7 @@ def learning(params, state_Queue, action_done, actions, reward_Queue):
         inference, value, log_prob, entropy = Agent.action_train(list_obs, list_target)
         n_inference += 1
 
-        putActions(n_process, inference, actions, action_done)
+        actions = putActions(n_process, inference, actions, state_Queue)
 
         torch_rewards, list_dones, masks = getReward(n_process, reward_Queue, list_dones)
 
@@ -152,7 +156,7 @@ def learning(params, state_Queue, action_done, actions, reward_Queue):
             n_update += 1
 
             if n_update % 200 == 0:  # test
-                test_done, test_succ, list_rewards = EnvReset(n_process, state_Queue, action_done, list_dones, actions)
+                actions, test_done, test_succ, list_rewards = EnvReset(n_process, state_Queue, action_done, list_dones, actions)
 
                 endTest = False
                 while True:
@@ -160,12 +164,12 @@ def learning(params, state_Queue, action_done, actions, reward_Queue):
 
                     if endTest is True:
                         best_rate = writeResult(n_process, test_done, test_succ, best_rate, Agent, params, n_update, start_time, logging)
-                        test_done, test_succ = callReset(n_process, actions, action_done)
+                        actions, test_done, test_succ = callReset(n_process, actions, state_Queue)
                         break
 
                     # do inference and make action
                     inference = Agent.action_test(list_obs, list_target)
-                    putActions(n_process, inference, actions, action_done)
+                    putActions(n_process, inference, actions, state_Queue)
 
                     for i in range(n_process):
                         rank, done, reward = reward_Queue.get()
